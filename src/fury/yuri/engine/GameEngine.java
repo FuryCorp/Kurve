@@ -29,12 +29,12 @@ public class GameEngine {
         loop.start();
     }
 
-    public void pause() {
-
-    }
-
     public void stop() {
         loop.stop();
+    }
+
+    public void pause() {
+
     }
 
     public EventHandler<KeyEvent> getOnKeyPressedEventHandler() {

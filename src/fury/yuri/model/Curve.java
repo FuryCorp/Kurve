@@ -1,7 +1,7 @@
 package fury.yuri.model;
 
+import fury.yuri.render.IRenderer;
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,12 @@ public class Curve {
     private IRenderer renderer;
 
     public void display() {
-        renderer.render();
+        //rendereru slat samo listu pozicija ?
+        renderer.render(this);
+    }
+
+    public void setRenderer(IRenderer renderer) {
+        this.renderer = renderer;
     }
 
     public void die() {
@@ -39,6 +44,8 @@ public class Curve {
         if(!live) {
             return;
         }
+
+        // o brzini i kutu ovisi kolko točaka dodavat ?
     }
 
     public void moveRight() {
