@@ -1,5 +1,6 @@
 package fury.yuri.model;
 
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
@@ -13,11 +14,16 @@ public class GameModel {
 
     private List<Curve> curves = new ArrayList<>();
     private List<String> pressedKeys = new ArrayList<>();
+    private BoundingBox boundingBox;
 
     public void addPressedKey(String key) {
         if(!pressedKeys.contains(key)) {
             pressedKeys.add(key);
         }
+    }
+
+    public void addCurve(Curve curve) {
+        curves.add(curve);
     }
 
     public void removePressedKey(String key) {
