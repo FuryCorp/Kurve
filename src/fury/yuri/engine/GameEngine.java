@@ -12,6 +12,7 @@ public class GameEngine {
 
     private GameModel gameModel;
     private AnimationTimer loop;
+    private boolean running;
 
     public GameEngine(GameModel gameModel) {
         this.gameModel = gameModel;
@@ -19,7 +20,6 @@ public class GameEngine {
             //~60fps
             @Override
             public void handle(long l) {
-                //razmislit o računanju vremenskih intervala i slanju kao argumenta update metodi
                 gameModel.update();
             }
         };
@@ -27,14 +27,16 @@ public class GameEngine {
 
     public void start() {
         loop.start();
+        running = true;
     }
 
     public void stop() {
         loop.stop();
+        running = false;
     }
 
-    public void pause() {
-
+    public boolean isRunning() {
+        return running;
     }
 
     public EventHandler<KeyEvent> getOnKeyPressedEventHandler() {

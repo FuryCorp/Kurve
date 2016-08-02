@@ -1,12 +1,11 @@
 package fury.yuri.model;
 
-import fury.yuri.listeners.ICurveListener;
-import fury.yuri.render.IRenderer;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by yuri on 29/07/16.
@@ -14,9 +13,6 @@ import java.util.List;
 public class Curve {
 
     //*****************************************************************
-
-    private List<ICurveListener> listeners = new ArrayList<>();
-
     private Point2D headPosition;
     private List<Point2D> previousPositions = new ArrayList<>();
     private double angle;
@@ -25,18 +21,21 @@ public class Curve {
     private String left;
     private String right;
 
-    private final int RADIUS = 5;
-    private final double SPEED = 1;
-    private final int ROTATION = 2;
+    private double radius = 5;
+    private double speed = 1;
+    private double rotation = 2;
+    private double holeChance = 0.2;
+    private double holeSize = 10;
 
     private boolean live = true;
 
-    private IRenderer renderer;
-
+    private Random rand = new Random();
     //*****************************************************************
 
-    public Curve(Point2D startPosition) {
+    public Curve(Point2D startPosition, String left, String right) {
         this.headPosition = startPosition;
+        this.left = left;
+        this.right = right;
     }
 
     public void die() {
@@ -47,60 +46,46 @@ public class Curve {
         if(!live) {
             return;
         }
-        double deltaX = SPEED*Math.cos(Math.toRadians(angle));
-        double deltaY = SPEED*Math.sin(Math.toRadians(angle));
-        Point2D newPoint = new Point2D(headPosition.getX() + deltaX, headPosition.getY() + deltaY);
-        previousPositions.add(newPoint);
+        double deltaX = speed*Math.cos(Math.toRadians(angle));
+        double deltaY = speed*Math.sin(Math.toRadians(angle));
+        Point2D newPoint = new Point2D(headPosition.getX() + deltaX, headPosition.getY() - deltaY);
+        previousPositions.add(headPosition);
         headPosition = newPoint;
-
-        notifyListeners();
-    }
-
-    public void moveLeft() {
-        if(!live) {
-            return;
-        }
-        angle -= ROTATION;
-        if(angle < 0) {
-            angle = 360+angle;
-        }
-        move();
     }
 
     public void moveRight() {
         if(!live) {
             return;
         }
-        angle += ROTATION;
+        angle -= rotation;
+        if(angle < 0) {
+            angle = 360+angle;
+        }
+        move();
+    }
+
+    public void moveLeft() {
+        if(!live) {
+            return;
+        }
+        angle += rotation;
         if(angle > 360) {
             angle = angle % 360;
         }
         move();
     }
 
-    public void addListener(ICurveListener l) {
-
-        listeners.add(l);
-    }
-
-    public void removeListener(ICurveListener l) {
-
-        listeners.remove(l);
-    }
-
-    public void notifyListeners() {
-
-        for(ICurveListener l : listeners) {
-            l.curveMoved(this);
-        }
+    @Override
+    public String toString() {
+        return color.toString();
     }
 
     public Color getColor() {
         return color;
     }
 
-    public int getRADIUS() {
-        return RADIUS;
+    public double getRadius() {
+        return radius;
     }
 
     public Point2D getLastHead() {
@@ -119,19 +104,15 @@ public class Curve {
         return right;
     }
 
-    public void setLeft(String left) {
-        this.left = left;
-    }
-
-    public void setRight(String right) {
-        this.right = right;
-    }
-
     public void setColor(Color color) {
         this.color = color;
     }
 
     public void setAngle(double angle) {
         this.angle = angle;
+    }
+
+    public List<Point2D> getPreviousPositions() {
+        return previousPositions;
     }
 }

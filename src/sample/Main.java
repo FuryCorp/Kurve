@@ -1,14 +1,14 @@
 package sample;
 
 import fury.yuri.engine.GameEngine;
-import fury.yuri.listeners.CanvasCurveListener;
-import fury.yuri.listeners.ICurveListener;
+import fury.yuri.listeners.ModelListener;
+import fury.yuri.listeners.IModelListener;
 import fury.yuri.model.Curve;
 import fury.yuri.model.GameModel;
-import fury.yuri.render.CanvasRenderer;
-import fury.yuri.render.IRenderer;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -58,28 +58,48 @@ public class Main extends Application {
         //test(gc);
 
         //curveTest(gc);
+
         movementTest(gc, scene);
     }
 
     private void movementTest(GraphicsContext gc, Scene scene) {
 
         GameModel model = new GameModel();
-        Curve redCurve = new Curve(new Point2D(100, 100));
+
+        BoundingBox boundingBox = new BoundingBox(20, 20, 938, 614);
+        model.setBoundingBox(boundingBox);
+
+        Curve redCurve = new Curve(new Point2D(100, 100), KeyCode.LEFT.toString(), KeyCode.RIGHT.toString());
         redCurve.setColor(Color.RED);
         redCurve.setAngle(0);
-        redCurve.setLeft(KeyCode.LEFT.toString());
-        redCurve.setRight(KeyCode.RIGHT.toString());
         model.addCurve(redCurve);
+
+        Curve blueCurve = new Curve(new Point2D(205, 305), KeyCode.A.toString(), KeyCode.S.toString());
+        blueCurve.setColor(Color.BLUE);
+        blueCurve.setAngle(90);
+        model.addCurve(blueCurve);
 
         GameEngine engine = new GameEngine(model);
 
-        ICurveListener listener = new CanvasCurveListener(gc);
-        redCurve.addListener(listener);
+        IModelListener listener = new ModelListener(gc);
+        model.addListener(listener);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, engine.getOnKeyPressedEventHandler());
         scene.addEventHandler(KeyEvent.KEY_RELEASED, engine.getOnKeyReleasedEventHandler());
 
-        engine.start();
+        EventHandler<KeyEvent> event = e -> {
+            if(e.getCode().equals(KeyCode.SPACE)) {
+                if(engine.isRunning()) {
+                    engine.stop();
+                } else {
+                    engine.start();
+                }
+            }
+        };
+
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, event);
+
+        //engine.start();
     }
 
     private void parabola(GraphicsContext gc) {
