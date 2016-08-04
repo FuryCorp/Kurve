@@ -1,5 +1,8 @@
 package fury.yuri.model;
 
+import fury.yuri.environment.EnvironmentVariables;
+import fury.yuri.environment.IEnvironmentListener;
+import fury.yuri.environment.IEnvironmentProvider;
 import fury.yuri.listeners.IModelListener;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
@@ -11,9 +14,11 @@ import java.util.*;
  */
 public class GameModel {
 
-    private List<IModelListener> listeners = new ArrayList<>();
+    private List<IModelListener> modelListeners = new ArrayList<>();
+    private List<IEnvironmentListener> envListeners = new ArrayList<>();
 
     private List<Curve> curves = new ArrayList<>();
+    private List<Curve> deadCurves = new ArrayList<>();
     private Set<String> pressedKeys = new LinkedHashSet<>();
     private BoundingBox boundingBox;
 
@@ -33,37 +38,67 @@ public class GameModel {
         }
     }
 
+    public boolean isPressed(String key) {
+        return pressedKeys.contains(key);
+    }
+
     public void update() {
         for(Curve curve : curves) {
-            if(pressedKeys.contains(curve.getLeft())) {
-                curve.moveLeft();
-            }
-            else if(pressedKeys.contains(curve.getRight())) {
-                curve.moveRight();
-            }
-            if(!pressedKeys.contains(curve.getRight()) && !pressedKeys.contains(curve.getLeft())) {
-                curve.move();
-            }
-            notifyListeners(curve);
-
-            if(!boundingBox.contains(curve.getCurrentHead())) {
-                curve.die();
-            } else {
-                checkIntersectionsFor(curve);
-            }
+            curve.scanEnvironment(this);
+            notifyModelListeners(curve);
+            checkIntersectionsFor(curve);
         }
+        for(Curve dead : deadCurves) {
+            curves.remove(dead);
+        }
+    }
 
+    public boolean isInside(Point2D point){
+        return boundingBox.contains(point);
+    }
+
+    public List<Curve> getCurves() {
+        return curves;
     }
 
     private void checkIntersectionsFor(Curve curve) {
+        if(!isInside(curve.getCurrentHead())) {
+            curve.die();
+            return;
+        }
 
         Point2D head = curve.getCurrentHead();
 
-        for(Curve check : curves) {
+        Iterator<Curve> iterator = curves.iterator();
+
+        while(iterator.hasNext()) {
+            Curve check = iterator.next();
             if(!curve.equals(check)) {
                 for(Point2D point : check.getPreviousPositions()) {
                     if(isCloseEnough(head, curve.getRadius(), point, check.getRadius())) {
                         curve.die();
+                        deadCurves.add(curve);
+                        break;
+                    }
+                }
+            } else {
+                double radius = curve.getRadius();
+                List<Point2D> positions = new ArrayList<>(curve.getPreviousPositions());
+                Collections.reverse(positions);
+                int notCounted = 0;
+                for(Point2D p : positions) {
+                    if(Math.abs(p.getX()-head.getX()) < radius && Math.abs(p.getY()-head.getY()) < radius) {
+                        notCounted++;
+                    } else {
+                        break;
+                    }
+                }
+                int size = curve.getPreviousPositions().size();
+                for(int i=0; i<size-notCounted; i++) {
+                    Point2D point = curve.getPreviousPositions().get(i);
+                    if(isCloseEnough(head, curve.getRadius(), point, check.getRadius())) {
+                        curve.die();
+                        deadCurves.add(curve);
                         break;
                     }
                 }
@@ -71,8 +106,7 @@ public class GameModel {
         }
     }
 
-    private boolean isCloseEnough(Point2D point1, double radius1, Point2D point2, double radius2) {
-
+    public boolean isCloseEnough(Point2D point1, double radius1, Point2D point2, double radius2) {
         double minDist = radius1/2 + radius2/2;
 
         return (Math.abs(point1.getX() - point2.getX()) < minDist
@@ -83,19 +117,16 @@ public class GameModel {
         this.boundingBox = boundingBox;
     }
 
-    public void addListener(IModelListener l) {
-
-        listeners.add(l);
+    public void addModelListener(IModelListener l) {
+        modelListeners.add(l);
     }
 
-    public void removeListener(IModelListener l) {
-
-        listeners.remove(l);
+    public void removeModelListener(IModelListener l) {
+        modelListeners.remove(l);
     }
 
-    private void notifyListeners(Curve curve) {
-
-        for(IModelListener l : listeners) {
+    private void notifyModelListeners(Curve curve) {
+        for(IModelListener l : modelListeners) {
             l.curveMoved(curve);
         }
     }

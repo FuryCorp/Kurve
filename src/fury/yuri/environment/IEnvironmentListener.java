@@ -7,5 +7,5 @@ import javafx.geometry.Point2D;
  */
 public interface IEnvironmentListener {
 
-    void environmentChanged(Point2D oldHead, Point2D newHead);
+    void environmentChanged(IEnvironmentProvider provider, EnvironmentVariables variables);
 }

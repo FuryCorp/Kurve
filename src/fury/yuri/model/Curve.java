@@ -10,7 +10,7 @@ import java.util.Random;
 /**
  * Created by yuri on 29/07/16.
  */
-public class Curve {
+public abstract class Curve {
 
     //*****************************************************************
     private Point2D headPosition;
@@ -24,12 +24,10 @@ public class Curve {
     private double radius = 5;
     private double speed = 1;
     private double rotation = 2;
-    private double holeChance = 0.2;
-    private double holeSize = 10;
+    //private double holeChance = 0.2;
+    //private double holeSize = 10;
 
     private boolean live = true;
-
-    private Random rand = new Random();
     //*****************************************************************
 
     public Curve(Point2D startPosition, String left, String right) {
@@ -75,6 +73,8 @@ public class Curve {
         move();
     }
 
+    public abstract void scanEnvironment(GameModel model);
+
     @Override
     public String toString() {
         return color.toString();
@@ -88,8 +88,8 @@ public class Curve {
         return radius;
     }
 
-    public Point2D getLastHead() {
-        return previousPositions.get(previousPositions.size()-1);
+    public double getSpeed() {
+        return speed;
     }
 
     public Point2D getCurrentHead() {
@@ -114,5 +114,9 @@ public class Curve {
 
     public List<Point2D> getPreviousPositions() {
         return previousPositions;
+    }
+
+    public double getAngle() {
+        return angle;
     }
 }

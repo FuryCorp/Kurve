@@ -4,7 +4,9 @@ import fury.yuri.engine.GameEngine;
 import fury.yuri.listeners.ModelListener;
 import fury.yuri.listeners.IModelListener;
 import fury.yuri.model.Curve;
+import fury.yuri.model.CurvePlayer;
 import fury.yuri.model.GameModel;
+import fury.yuri.model.SimpleCurveAI;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -69,20 +71,30 @@ public class Main extends Application {
         BoundingBox boundingBox = new BoundingBox(20, 20, 938, 614);
         model.setBoundingBox(boundingBox);
 
-        Curve redCurve = new Curve(new Point2D(100, 100), KeyCode.LEFT.toString(), KeyCode.RIGHT.toString());
+        Curve redCurve = new CurvePlayer(new Point2D(100, 100), KeyCode.LEFT.toString(), KeyCode.RIGHT.toString());
         redCurve.setColor(Color.RED);
         redCurve.setAngle(0);
         model.addCurve(redCurve);
 
-        Curve blueCurve = new Curve(new Point2D(205, 305), KeyCode.A.toString(), KeyCode.S.toString());
+        Curve simpleCurveAI = new SimpleCurveAI(new Point2D(300, 300), null, null);
+        simpleCurveAI.setColor(Color.BLUE);
+        simpleCurveAI.setAngle(0);
+        //model.addCurve(simpleCurveAI);
+
+        /*Curve blueCurve = new CurvePlayer(new Point2D(205, 305), KeyCode.A.toString(), KeyCode.S.toString());
         blueCurve.setColor(Color.BLUE);
         blueCurve.setAngle(90);
         model.addCurve(blueCurve);
 
+        Curve greenCurve = new CurvePlayer(new Point2D(505, 405), KeyCode.B.toString(), KeyCode.N.toString());
+        greenCurve.setColor(Color.GREEN);
+        greenCurve.setAngle(0);
+        model.addCurve(greenCurve);*/
+
         GameEngine engine = new GameEngine(model);
 
         IModelListener listener = new ModelListener(gc);
-        model.addListener(listener);
+        model.addModelListener(listener);
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, engine.getOnKeyPressedEventHandler());
         scene.addEventHandler(KeyEvent.KEY_RELEASED, engine.getOnKeyReleasedEventHandler());
