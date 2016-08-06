@@ -1,7 +1,11 @@
 package fury.yuri.model;
 
+import fury.yuri.geometry.MyLine;
+import fury.yuri.geometry.MyPoint;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,11 +16,11 @@ import java.util.List;
  */
 public class SimpleCurveAI extends Curve {
 
-    private final double STEP = 10;
+    private final double STEP = 5;
     private final double SPEED = 1;
 
-    public SimpleCurveAI(Point2D startPosition, String left, String right) {
-        super(startPosition, left, right);
+    public SimpleCurveAI(Point2D startPosition) {
+        super(startPosition, null, null);
     }
 
     @Override
@@ -25,18 +29,15 @@ public class SimpleCurveAI extends Curve {
         double bestAngle = 0;
         double bestDistance = 0;
         for(double angle=0; angle<360; angle+=STEP) {
-            int distance = 0;
-            while(!intersects(model, curr)) {
-                double deltaX = SPEED*Math.cos(Math.toRadians(angle));
-                double deltaY = SPEED*Math.sin(Math.toRadians(angle));
-                curr = new Point2D(curr.getX() + deltaX, curr.getY() - deltaY);
-                distance++;
-            }
+
+            Point2D end = getEndPointFor(curr, angle, model);
+            Line2D line = new MyLine(new MyPoint(curr.getX(), curr.getY()), new MyPoint(end.getX(), end.getY()));
+
+            double distance = minIntersectionDistance(model, line);
             if(distance > bestDistance) {
                 bestDistance = distance;
                 bestAngle = angle;
             }
-            curr = getCurrentHead();
         }
 
         double currAngle = getAngle();
@@ -58,6 +59,66 @@ public class SimpleCurveAI extends Curve {
         }
     }
 
+    private Point2D getEndPointFor(Point2D start, double angle, GameModel model) {
+        while(model.isInside(start)) {
+            double deltaX = Math.cos(Math.toRadians(angle));
+            double deltaY = Math.sin(Math.toRadians(angle));
+            start = new Point2D(start.getX() + deltaX, start.getY() - deltaY);
+        }
+        return start;
+    }
+
+    private double distanceBetween(Point2D p1, Point2D p2) {
+
+        double dx1 = p2.getX() - p1.getX();
+        double dy1 = p2.getY() - p1.getY();
+        return Math.sqrt(dx1 * dx1 + dy1 * dy1);
+    }
+
+    private double minIntersectionDistance(GameModel model, Line2D line) {
+
+        double minDist = distanceBetween(new Point2D(line.getX1(), line.getY1()), new Point2D(line.getX2(), line.getY2()));
+
+        Iterator<Curve> iterator = model.getCurves().iterator();
+
+        while(iterator.hasNext()) {
+            Curve check = iterator.next();
+            double err = check.getRadius();
+            if(!this.equals(check)) {
+                for(Point2D p : check.getPreviousPositions()) {
+                    double errDist = line.ptSegDist(new MyPoint(p.getX(), p.getY()));
+                    double dist = distanceBetween(new Point2D(line.getX1(), line.getY1()), p);
+                    if(errDist < err && minDist > dist) {
+                        minDist = dist;
+                    }
+                }
+            } else {
+                double radius = getRadius();
+                List<Point2D> positions = new ArrayList<>(getPreviousPositions());
+                Collections.reverse(positions);
+                int notCounted = 0;
+                for(Point2D p : positions) {
+                    if(Math.abs(p.getX()-getCurrentHead().getX()) < radius && Math.abs(p.getY()-getCurrentHead().getY()) < radius) {
+                        notCounted++;
+                    } else {
+                        break;
+                    }
+                }
+                int size = getPreviousPositions().size();
+                for(int i=0; i<size-notCounted; i++) {
+                    Point2D p = getPreviousPositions().get(i);
+                    double errDist = line.ptSegDist(new MyPoint(p.getX(), p.getY()));
+                    double dist = distanceBetween(new Point2D(line.getX1(), line.getY1()), p);
+                    if(errDist < err && minDist > dist) {
+                        minDist = dist;
+                    }
+                }
+            }
+        }
+        return minDist;
+    }
+
+    /*
     private boolean intersects(GameModel model, Point2D point) {
 
         if(!model.isInside(point)) {
@@ -97,4 +158,5 @@ public class SimpleCurveAI extends Curve {
         }
         return false;
     }
+    */
 }

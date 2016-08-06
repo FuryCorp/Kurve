@@ -76,10 +76,10 @@ public class Main extends Application {
         redCurve.setAngle(0);
         model.addCurve(redCurve);
 
-        Curve simpleCurveAI = new SimpleCurveAI(new Point2D(300, 300), null, null);
+        Curve simpleCurveAI = new SimpleCurveAI(new Point2D(300, 300));
         simpleCurveAI.setColor(Color.BLUE);
         simpleCurveAI.setAngle(0);
-        //model.addCurve(simpleCurveAI);
+        model.addCurve(simpleCurveAI);
 
         /*Curve blueCurve = new CurvePlayer(new Point2D(205, 305), KeyCode.A.toString(), KeyCode.S.toString());
         blueCurve.setColor(Color.BLUE);

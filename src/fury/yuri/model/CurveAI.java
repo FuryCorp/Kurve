@@ -2,6 +2,7 @@ package fury.yuri.model;
 
 import fury.yuri.network.NeuralNetwork;
 import javafx.geometry.Point2D;
+import javafx.scene.shape.Line;
 
 /**
  * Created by yuri on 04/08/16.
@@ -10,8 +11,8 @@ public class CurveAI extends Curve {
 
     private NeuralNetwork network;
 
-    public CurveAI(Point2D startPosition, String left, String right, NeuralNetwork network) {
-        super(startPosition, left, right);
+    public CurveAI(Point2D startPosition, NeuralNetwork network) {
+        super(startPosition, null, null);
         this.network = network;
     }
 
