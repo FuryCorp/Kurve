@@ -20,6 +20,10 @@ public class ModelListener implements IModelListener {
     @Override
     public void curveMoved(Curve curve) {
 
+        if(curve.isTransparent()) {
+            return;
+        }
+
         Point2D currentHead = curve.getCurrentHead();
         Color color = curve.getColor();
         double radius = curve.getRadius();

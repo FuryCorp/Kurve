@@ -16,8 +16,7 @@ import java.util.List;
  */
 public class SimpleCurveAI extends Curve {
 
-    private final double STEP = 5;
-    private final double SPEED = 1;
+    private final double STEP = 10;
 
     public SimpleCurveAI(Point2D startPosition) {
         super(startPosition, null, null);
@@ -28,7 +27,7 @@ public class SimpleCurveAI extends Curve {
         Point2D curr = getCurrentHead();
         double bestAngle = 0;
         double bestDistance = 0;
-        for(double angle=0; angle<360; angle+=STEP) {
+        for(double angle=getAngle()-90; angle<getAngle()+90; angle+=STEP) {
 
             Point2D end = getEndPointFor(curr, angle, model);
             Line2D line = new MyLine(new MyPoint(curr.getX(), curr.getY()), new MyPoint(end.getX(), end.getY()));

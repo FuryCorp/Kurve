@@ -15,11 +15,11 @@ import java.util.*;
 public class GameModel {
 
     private List<IModelListener> modelListeners = new ArrayList<>();
-    private List<IEnvironmentListener> envListeners = new ArrayList<>();
 
     private List<Curve> curves = new ArrayList<>();
     private List<Curve> deadCurves = new ArrayList<>();
     private List<Curve> liveCurves = new ArrayList<>();
+
     private Set<String> pressedKeys = new LinkedHashSet<>();
     private BoundingBox boundingBox;
 
@@ -47,8 +47,8 @@ public class GameModel {
     public void update() {
         for(Curve curve : liveCurves) {
             curve.scanEnvironment(this);
-            notifyModelListeners(curve);
             checkIntersectionsFor(curve);
+            notifyModelListeners(curve);
         }
         for(Curve dead : deadCurves) {
             liveCurves.remove(dead);
@@ -66,6 +66,7 @@ public class GameModel {
     private void checkIntersectionsFor(Curve curve) {
         if(!isInside(curve.getCurrentHead())) {
             curve.die();
+            deadCurves.add(curve);
             return;
         }
 
@@ -109,14 +110,10 @@ public class GameModel {
     }
 
     public boolean isCloseEnough(Point2D point1, double radius1, Point2D point2, double radius2) {
-        double minDist = radius1/2 + radius2/2;
+        double minDist = (radius1/2 + radius2/2)/1.5;
 
         return (Math.abs(point1.getX() - point2.getX()) < minDist
                 && Math.abs(point1.getY() - point2.getY()) < minDist);
-    }
-
-    public BoundingBox getBoundingBox() {
-        return boundingBox;
     }
 
     public void setBoundingBox(BoundingBox boundingBox) {
