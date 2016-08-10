@@ -2,14 +2,14 @@ package fury.yuri.model;
 
 import fury.yuri.geometry.MyLine;
 import fury.yuri.geometry.MyPoint;
+import fury.yuri.utility.Utility;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by yuri on 04/08/16.
@@ -17,9 +17,12 @@ import java.util.List;
 public class SimpleCurveAI extends Curve {
 
     private final double STEP = 10;
+    private GraphicsContext gc;
+    Random rand = new Random();
 
-    public SimpleCurveAI(Point2D startPosition) {
+    public SimpleCurveAI(Point2D startPosition, GraphicsContext gc) {
         super(startPosition, null, null);
+        this.gc = gc;
     }
 
     @Override
@@ -27,9 +30,10 @@ public class SimpleCurveAI extends Curve {
         Point2D curr = getCurrentHead();
         double bestAngle = 0;
         double bestDistance = 0;
-        for(double angle=getAngle()-90; angle<getAngle()+90; angle+=STEP) {
+        for(double angle=0; angle<360; angle+=STEP) {
 
-            Point2D end = getEndPointFor(curr, angle, model);
+            Point2D end = Utility.getEndPointFor(curr, angle, model);
+            //getEndPointFor(curr, angle, model);
             Line2D line = new MyLine(new MyPoint(curr.getX(), curr.getY()), new MyPoint(end.getX(), end.getY()));
 
             double distance = minIntersectionDistance(model, line);
@@ -64,6 +68,13 @@ public class SimpleCurveAI extends Curve {
             double deltaY = Math.sin(Math.toRadians(angle));
             start = new Point2D(start.getX() + deltaX, start.getY() - deltaY);
         }
+
+        /*
+        System.out.println("REGULAR angle = " + angle);
+        System.out.println("x: " + (start.getX()));
+        System.out.println("y: " + (start.getY()));
+        */
+
         return start;
     }
 
@@ -83,6 +94,7 @@ public class SimpleCurveAI extends Curve {
         while(iterator.hasNext()) {
             Curve check = iterator.next();
             double err = check.getRadius();
+
             if(!this.equals(check)) {
                 for(Point2D p : check.getPreviousPositions()) {
                     double errDist = line.ptSegDist(new MyPoint(p.getX(), p.getY()));

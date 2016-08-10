@@ -1,9 +1,13 @@
 package fury.yuri.model;
 
+import fury.yuri.geometry.MyPoint;
+import fury.yuri.utility.Utility;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -14,6 +18,7 @@ public abstract class Curve {
 
     //*****************************************************************
     private Point2D headPosition;
+    //slagat u stablo ???
     private List<Point2D> previousPositions = new ArrayList<>();
     private double angle;
     private Color color;
@@ -24,9 +29,9 @@ public abstract class Curve {
     private double radius = 5;
     private double speed = 1.2;
     private double rotation = 3;
-    private double holeChance = 0.001;
-    private double holeSize = 15;
-    private double holeCounter = 15;
+    private double holeChance = 0.002;
+    private double holeSize = radius*3;
+    private double holeCounter = radius*3;
 
     private boolean transparent;
     private boolean live = true;
@@ -51,6 +56,42 @@ public abstract class Curve {
         }
 
         return false;
+    }
+
+    public List<Point2D> intersectingPoints(Line2D line, boolean self) {
+
+        double err = radius;
+        List<Point2D> result = new ArrayList<>();
+
+        if(self) {
+            List<Point2D> positions = new ArrayList<>(previousPositions);
+            Collections.reverse(positions);
+            int notCounted = 0;
+            for(Point2D p : positions) {
+                if(Math.abs(p.getX()-headPosition.getX()) < radius && Math.abs(p.getY()-headPosition.getY()) < radius) {
+                    notCounted++;
+                } else {
+                    break;
+                }
+            }
+            int size = previousPositions.size();
+            for(int i=0; i<size-notCounted; i++) {
+                Point2D p = previousPositions.get(i);
+                MyPoint point = new MyPoint(p.getX(), p.getY());
+                if(line.ptSegDist(point) < err) {
+                    result.add(p);
+                }
+            }
+        } else {
+            for (Point2D p : previousPositions) {
+                MyPoint point = new MyPoint(p.getX(), p.getY());
+                if (line.ptSegDist(point) < err) {
+                    result.add(p);
+                }
+            }
+        }
+
+        return result;
     }
 
     public void die() {
