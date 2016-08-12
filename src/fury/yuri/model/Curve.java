@@ -58,7 +58,17 @@ public abstract class Curve {
         return false;
     }
 
+    /**
+     * Gets points of this curve which line intersects,
+     * if self is true than dots touching the head are ignored
+     * @param line
+     * @param self
+     * @return
+     */
+
     public List<Point2D> intersectingPoints(Line2D line, boolean self) {
+
+        //IZMJENIT !!!!
 
         double err = radius;
         List<Point2D> result = new ArrayList<>();

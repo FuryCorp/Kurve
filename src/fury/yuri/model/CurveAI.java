@@ -127,6 +127,17 @@ public class CurveAI extends Curve {
         return new MyLine(start, end);
     }
 
+    private class LineTuple {
+
+        Line2D closest;
+        Line2D farthest;
+
+        public LineTuple(Line2D closest, Line2D farthest) {
+            this.closest = closest;
+            this.farthest = farthest;
+        }
+    }
+
     private List<Line2D> linesToClosestAndFarthestBarriers(double minusAngle, double plusAngle, GameModel model) {
 
         Point2D head = getCurrentHead();

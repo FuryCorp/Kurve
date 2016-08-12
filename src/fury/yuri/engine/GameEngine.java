@@ -40,14 +40,10 @@ public class GameEngine {
     }
 
     public EventHandler<KeyEvent> getOnKeyPressedEventHandler() {
-        return e -> {
-            gameModel.addPressedKey(e.getCode().toString());
-        };
+        return e -> gameModel.addPressedKey(e.getCode().toString());
     }
 
     public EventHandler<KeyEvent> getOnKeyReleasedEventHandler() {
-        return e -> {
-            gameModel.removePressedKey(e.getCode().toString());
-        };
+        return e -> gameModel.removePressedKey(e.getCode().toString());
     }
 }
