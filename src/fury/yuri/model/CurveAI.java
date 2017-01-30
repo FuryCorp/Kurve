@@ -7,7 +7,6 @@ import fury.yuri.network.NeuralNetwork;
 import fury.yuri.utility.Utility;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
-import javafx.scene.shape.Line;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class CurveAI extends Curve {
     private Random rand = new Random();
 
     public CurveAI(Point2D startPosition, NeuralNetwork network) {
-        super(startPosition, KeyCode.A.toString(), KeyCode.S.toString());
+        super(startPosition, KeyCode.A.toString(), KeyCode.S.toString()); // null null
         this.network = network;
     }
 
@@ -37,6 +36,8 @@ public class CurveAI extends Curve {
     public void scanEnvironment(GameModel model) {
         //analizirat model -> izvuc iz modela ulaz za mrezu -> ulaz provuc kroz mrezu ->
         //dobit izlaz -> pomaknut kurvu na racun izlaza
+        //ulaz za mrezu: 4 udaljenosti od bounding boxa, udaljenost i relativni kut do najblize i najdalje barijere,
+        //               udaljenost i relativni kut do glave najblizeg neprijatelja
 
         if(model.isPressed(getLeft())) {
             moveLeft();
@@ -49,7 +50,7 @@ public class CurveAI extends Curve {
         }
 
         List<Line2D> lines = new ArrayList<>();
-        lines.add(lineToNearestLiveEnemyHead(model));
+        //lines.add(lineToNearestLiveEnemyHead(model));
         if(rand.nextDouble() < 0.5) {
             for(ILineTracer lt : lineTracers) {
                 lt.drawLines(lines);
@@ -60,7 +61,7 @@ public class CurveAI extends Curve {
     //***********************GET SOME INFORMATION FOR AI
     //PAZIT NA DEBLJINE
     //iz linija lako mogu izvuc udaljenosti
-
+/*
     private double leftWallDistance(GameModel model) {
         Line2D l = lineToLeftWall(model);
         return Utility.distanceBetween(l.getX1(), l.getY1(), l.getX2(), l.getY2());
@@ -200,6 +201,7 @@ public class CurveAI extends Curve {
             }
         });
 
+        // NULL POINTER EXCEPTION KASNIJE U KODU ??!?!?!?
         if(heads.isEmpty()) {
             return null;
         }
@@ -219,6 +221,7 @@ public class CurveAI extends Curve {
         return new MyLine(new MyPoint(head.getX(), head.getY()), new MyPoint(closest.getX(), closest.getY()));
     }
 
+
     public double relativeAngleToNearestEnemyHead(GameModel model) {
         return 0;
     }
@@ -230,4 +233,5 @@ public class CurveAI extends Curve {
     public void removeLineTracer(ILineTracer lt) {
         lineTracers.remove(lt);
     }
+   */
 }

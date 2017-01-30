@@ -1,8 +1,6 @@
 package fury.yuri.model;
 
-import fury.yuri.environment.EnvironmentVariables;
-import fury.yuri.environment.IEnvironmentListener;
-import fury.yuri.environment.IEnvironmentProvider;
+import fury.yuri.geometry.Pixel;
 import fury.yuri.listeners.IModelListener;
 import fury.yuri.utility.Utility;
 import javafx.geometry.BoundingBox;
@@ -46,13 +44,36 @@ public class GameModel {
     }
 
     public void update() {
-        for(Curve curve : liveCurves) {
-            curve.scanEnvironment(this);
-            checkIntersectionsFor(curve);
-            notifyModelListeners(curve);
+        for(Curve curve : curves) {
+            if(curve.isLive()) {
+                curve.scanEnvironment(this);
+                //TODO dodat metodu koja će provjerat intersekcije preko set-a
+                killCurves(curve);
+                //checkIntersectionsFor(curve);
+                notifyModelListeners(curve);
+            }
         }
         for(Curve dead : deadCurves) {
             liveCurves.remove(dead);
+        }
+    }
+
+    private void killCurves(Curve current) {
+        if(!isInside(current.getCurrentHead())) {
+            current.die();
+            return;
+        }
+
+        for(Curve c : curves) {
+            if(current.equals(c)) {
+                if(c.contains(current.getCurrentHead(), current.getRadius(), true)) {
+                    current.die();
+                }
+            } else {
+                if(c.contains(current.getCurrentHead(), current.getRadius(), false)) {
+                    current.die();
+                }
+            }
         }
     }
 

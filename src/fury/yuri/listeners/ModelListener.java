@@ -6,12 +6,16 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.Random;
+
 /**
  * Created by yuri on 01/08/16.
  */
 public class ModelListener implements IModelListener {
 
     private GraphicsContext gc;
+
+    private Random rand = new Random();
 
     public ModelListener(GraphicsContext gc) {
         this.gc = gc;
@@ -29,7 +33,11 @@ public class ModelListener implements IModelListener {
         double radius = curve.getRadius();
 
         gc.setFill(color);
+        //gc.fillOval((int)Math.round(currentHead.getX()-radius/2), (int)Math.round(currentHead.getY()-radius/2), radius, radius);
         gc.fillOval(currentHead.getX()-radius/2, currentHead.getY()-radius/2, radius, radius);
+        //gc.beginPath();
+        //gc.fillOval(rand.nextDouble()*300+50,rand.nextDouble()*500+50,4,4);
+        //gc.closePath();
     }
 
     @Override

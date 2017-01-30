@@ -1,24 +1,22 @@
 package fury.yuri.model;
 
 import fury.yuri.geometry.MyPoint;
+import fury.yuri.geometry.Pixel;
 import fury.yuri.utility.Utility;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
 import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by yuri on 29/07/16.
  */
 public abstract class Curve {
 
+    private Set<Pixel> pixels = new HashSet<>();
     //*****************************************************************
     private Point2D headPosition;
-    //slagat u stablo ???
     private List<Point2D> previousPositions = new ArrayList<>();
     private double angle;
     private Color color;
@@ -26,8 +24,8 @@ public abstract class Curve {
     private String left;
     private String right;
 
-    private double radius = 5;
-    private double speed = 1.2;
+    private int radius = 5;
+    private double speed = 0.5;
     private double rotation = 3;
     private double holeChance = 0.002;
     private double holeSize = radius*3;
@@ -41,20 +39,34 @@ public abstract class Curve {
 
     public Curve(Point2D startPosition, String left, String right) {
         this.headPosition = startPosition;
+        pixels.add(Utility.pointToPixel(startPosition));
         this.left = left;
         this.right = right;
     }
 
-    public boolean contains(Point2D point, double radius) {
-        double minDist = radius/2 + this.radius/2;
+    /**
+     * Check if any of pixels including central pixel and its surroundings at radius r intersects
+     * with any of pixels that this Curve aready contains
+     * @param point center of given head
+     * @param r radius
+     * @return check description
+     */
 
-        for(Point2D p : previousPositions) {
-            if(Math.abs(point.getX() - p.getX()) < minDist
-                    && Math.abs(point.getY() - p.getY()) < minDist) {
+    public boolean contains(Point2D point, int r, boolean self) {
+
+        Pixel pixel = Utility.pointToPixel(point);
+        Set<Pixel> generatedPixels = Utility.generatePoints(pixel, r);
+        Set<Pixel> headPixels = Utility.generatePoints(Utility.pointToPixel(headPosition), radius);
+
+        if (self) {
+            this.pixels.removeAll(headPixels);
+        }
+        for (Pixel p : generatedPixels) {
+            if(this.pixels.contains(p)) {
                 return true;
             }
         }
-
+        this.pixels.addAll(headPixels);
         return false;
     }
 
@@ -105,6 +117,7 @@ public abstract class Curve {
     }
 
     public void die() {
+        System.out.println("DIEEE");
         live = false;
     }
 
@@ -112,14 +125,36 @@ public abstract class Curve {
         if(!live) {
             return;
         }
-        checkTransparency();
+        //checkTransparency();
+
         double deltaX = speed*Math.cos(Math.toRadians(angle));
         double deltaY = speed*Math.sin(Math.toRadians(angle));
         Point2D newPoint = new Point2D(headPosition.getX() + deltaX, headPosition.getY() - deltaY);
+
+        Pixel pixel = Utility.pointToPixel(newPoint);
+
+        //System.out.println("Pixel: " + newPoint.getX() + " " + newPoint.getY());
+        //System.out.println("Pixel: " + pixel.getX() + " " + pixel.getY());
+
         if(!transparent) {
-            previousPositions.add(headPosition);
+            previousPositions.add(newPoint);
+            pixels.addAll(Utility.generatePoints(pixel, radius));
         }
+
         headPosition = newPoint;
+
+        //TU SE KUVA NESTO -> spremaj prave vrijednosti samo radi updateanja, prave za model su one zaokružene
+
+        //System.out.println("pxl -->" + pixel);
+        //System.out.println("new -->" + newPoint);
+
+        //TODO sve ovo ispod
+
+        //IDEJA: za glavu kad idemo provjeravat jel mrtva: uzmi njen radijus i generiraj sve cijele brojeve
+        //koju su obuhvaćeni tim radijusom oko glave. za svaki taj broj iz setova ostalih kurvi pokušat pronać
+        //te brojeve pa ako su isti onda je udarila u nešto. problem je jedino radijus druge kurve, ova metoda će
+        //samo centar druge kurve uzimat u obzir. Jedna opcija je da istovremeno iz drugih kurvi odmah izvucem sve
+        //piksele oko centra koje zauzimaju i spremim u set
     }
 
     private void checkTransparency() {
@@ -161,6 +196,10 @@ public abstract class Curve {
 
     public abstract void scanEnvironment(GameModel model);
 
+    public Set<Pixel> getPixels() {
+        return pixels;
+    }
+
     @Override
     public String toString() {
         return color.toString();
@@ -170,7 +209,7 @@ public abstract class Curve {
         return color;
     }
 
-    public double getRadius() {
+    public int getRadius() {
         return radius;
     }
 
@@ -180,6 +219,10 @@ public abstract class Curve {
 
     public Point2D getCurrentHead() {
         return headPosition;
+    }
+
+    public boolean isLive() {
+        return live;
     }
 
     public String getLeft() {

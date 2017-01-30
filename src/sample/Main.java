@@ -75,22 +75,22 @@ public class Main extends Application {
         redCurve.setAngle(0);
         model.addCurve(redCurve);
 
-        Curve simpleCurveAI1 = new SimpleCurveAI(new Point2D(300, 300), gc);
+        Curve simpleCurveAI1 = new SimpleCurveAI(new Point2D(203, 500), gc);
         simpleCurveAI1.setColor(Color.BLUE);
-        simpleCurveAI1.setAngle(0);
+        simpleCurveAI1.setAngle(180);
         model.addCurve(simpleCurveAI1);
-
+        /*
         Curve simpleCurveAI2 = new SimpleCurveAI(new Point2D(400, 400), gc);
         simpleCurveAI2.setColor(Color.GREEN);
         simpleCurveAI2.setAngle(270);
-        //model.addCurve(simpleCurveAI2);
+        model.addCurve(simpleCurveAI2);
 
         CurveAI curveAI = new CurveAI(new Point2D(200, 200), null);
         curveAI.setColor(Color.CYAN);
         curveAI.setAngle(0);
         model.addCurve(curveAI);
         ILineTracer lt = new LineTracer(gc);
-        curveAI.addLineTracer(lt);
+        curveAI.addLineTracer(lt);*/
 
         /*Curve blueCurve = new CurvePlayer(new Point2D(205, 305), KeyCode.A.toString(), KeyCode.S.toString());
         blueCurve.setColor(Color.BLUE);

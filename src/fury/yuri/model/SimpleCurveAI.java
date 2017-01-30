@@ -3,10 +3,8 @@ package fury.yuri.model;
 import fury.yuri.geometry.MyLine;
 import fury.yuri.geometry.MyPoint;
 import fury.yuri.utility.Utility;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.awt.geom.Line2D;
 import java.util.*;

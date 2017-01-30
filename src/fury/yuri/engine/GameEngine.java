@@ -17,10 +17,14 @@ public class GameEngine {
     public GameEngine(GameModel gameModel) {
         this.gameModel = gameModel;
         loop = new AnimationTimer() {
+            long old = 0;
             //~60fps
             @Override
             public void handle(long l) {
-                gameModel.update();
+                if(l-old >= 50000000/30) {
+                    gameModel.update();
+                    old = l;
+                }
             }
         };
     }

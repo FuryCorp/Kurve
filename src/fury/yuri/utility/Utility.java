@@ -2,13 +2,16 @@ package fury.yuri.utility;
 
 import fury.yuri.geometry.MyLine;
 import fury.yuri.geometry.MyPoint;
+import fury.yuri.geometry.Pixel;
 import fury.yuri.model.Curve;
 import fury.yuri.model.GameModel;
 import javafx.geometry.Point2D;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by yuri on 08/08/16.
@@ -118,5 +121,23 @@ public class Utility {
         */
 
         return new Point2D(start.getX()+deltaX, start.getY()-deltaY);
+    }
+
+    public static Set<Pixel> generatePoints(Pixel pixel, int radius) {
+
+        Set<Pixel> result = new HashSet<>();
+
+        for(int x = pixel.x-radius; x<pixel.x+radius; x++) {
+            for(int y = pixel.y-radius; y<pixel.y+radius; y++) {
+                if(Math.pow(x - pixel.x, 2) + Math.pow(y - pixel.y, 2) < Math.pow(radius, 2)) {
+                    result.add(new Pixel(x, y));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Pixel pointToPixel(Point2D point) {
+        return new Pixel((int) Math.round(point.getX()), (int) Math.round(point.getY()));
     }
 }
